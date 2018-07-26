@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+
 /**
  * @author afeng
  * @date 2018/7/25 15:28
@@ -20,6 +21,7 @@ public class MainFrame extends Frame implements KeyListener
     /**
      * 场景数据的模拟,使用二维数组模拟
      * 1代表障碍,0代表空地.
+     * 4代表箱子
      */
     int[][] datas = {
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -35,6 +37,13 @@ public class MainFrame extends Frame implements KeyListener
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
+
+    /**
+     * wolfX灰太狼横向的位置
+     * wolfY灰太狼纵向的位置
+     */
+    int wolfX=1;
+    int wolfY=1;
 
     public MainFrame()
     {
@@ -93,6 +102,7 @@ public class MainFrame extends Frame implements KeyListener
 
         //设置窗口可见
         this.setVisible(true);
+
     }
 
     /**
@@ -102,7 +112,7 @@ public class MainFrame extends Frame implements KeyListener
     {
         Icon icon = new ImageIcon("greyWolfDownMove.png");
         lab_greywolf = new JLabel(icon);
-        lab_greywolf.setBounds(300, 300, 50, 50);
+        lab_greywolf.setBounds(12 + wolfX * 50, 36 + wolfY * 50, 50, 50);
         this.add(lab_greywolf);
     }
 
@@ -116,14 +126,17 @@ public class MainFrame extends Frame implements KeyListener
         JLabel lab_sheep1 = new JLabel(icon);
         lab_sheep1.setBounds(312, 236, 50, 50);
         this.add(lab_sheep1);
+        datas[4][6] = 4;
 
         JLabel lab_sheep2 = new JLabel(icon);
-        lab_sheep2.setBounds(312, 286, 50, 50);
+        lab_sheep2.setBounds(312, 336, 50, 50);
         this.add(lab_sheep2);
+        datas[6][6] = 4;
 
         JLabel lab_sheep3 = new JLabel(icon);
-        lab_sheep3.setBounds(312, 336, 50, 50);
+        lab_sheep3.setBounds(312, 436, 50, 50);
         this.add(lab_sheep3);
+        datas[8][6] = 4;
     }
 
     /**
@@ -203,6 +216,32 @@ public class MainFrame extends Frame implements KeyListener
          */
         if (key == 39)
         {
+
+            /**
+             * 碰撞检测之人物遇到障碍
+             */
+            if (datas[wolfY][wolfX + 1] == 1)
+            {
+                return;
+            }
+            /**
+             * 碰撞检测之人物遇到箱子
+             */
+            if (datas[wolfY][wolfX + 1] == 4)
+            {
+                datas[wolfY][wolfX + 1] = 0;
+                datas[wolfY][wolfX + 2] = 4;
+
+                wolfX = wolfX + 1;
+                int x = (int) lab_greywolf.getLocation().getX();
+                int y = (int) lab_greywolf.getLocation().getY();
+                lab_greywolf.setLocation(x + 50, y);
+                Icon icon = new ImageIcon("greyWolfRightMove.png");
+                lab_greywolf.setIcon(icon);
+                return;
+            }
+
+            wolfX = wolfX + 1;
             int x = (int) lab_greywolf.getLocation().getX();
             int y = (int) lab_greywolf.getLocation().getY();
             lab_greywolf.setLocation(x + 50, y);
@@ -215,18 +254,28 @@ public class MainFrame extends Frame implements KeyListener
          */
         if (key == 37)
         {
+
+            if (datas[wolfY][wolfX-1] == 1)
+            {
+                return;
+            }
+            wolfX = wolfX - 1;
             int x = (int) lab_greywolf.getLocation().getX();
             int y = (int) lab_greywolf.getLocation().getY();
             lab_greywolf.setLocation(x - 50, y);
             Icon icon = new ImageIcon("greyWolfLeftMove.png");
             lab_greywolf.setIcon(icon);
-
         }
         /**
          * 向上移动
          */
         if (key == 38)
         {
+            if (datas[wolfY-1][wolfX] == 1)
+            {
+                return;
+            }
+            wolfY = wolfY - 1;
             int x = (int) lab_greywolf.getLocation().getX();
             int y = (int) lab_greywolf.getLocation().getY();
             lab_greywolf.setLocation(x, y - 50);
@@ -239,6 +288,11 @@ public class MainFrame extends Frame implements KeyListener
          */
         if (key == 40)
         {
+            if (datas[wolfY + 1][wolfX] == 1)
+            {
+                return;
+            }
+            wolfY = wolfY + 1;
             int x = (int) lab_greywolf.getLocation().getX();
             int y = (int) lab_greywolf.getLocation().getY();
             lab_greywolf.setLocation(x, y + 50);
